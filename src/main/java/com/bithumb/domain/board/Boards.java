@@ -34,5 +34,15 @@ public class Boards {
         this.author = author;
     }
 
+    /**
+     * JPS의 영속성 컨텍스트 이므로 데이터를 저장해도 엔티티를 영구 저장한다.
+     * @param title
+     * @param content
+     */
+    public void update(String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
+
 
 }
