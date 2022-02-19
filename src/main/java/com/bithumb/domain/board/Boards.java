@@ -1,5 +1,6 @@
 package com.bithumb.domain.board;
 
+import com.bithumb.domain.BaseTimeEntity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,7 +14,7 @@ import javax.persistence.Column;
 @Getter
 @NoArgsConstructor
 @Entity
-public class Boards {
+public class Boards extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)  // auto_increment

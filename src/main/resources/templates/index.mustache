@@ -1,0 +1,32 @@
+{{>layout/header}}
+    <h1>Spring Boot Web Service Test</h1>
+    <div class="col-md-12">
+        <div class="row">
+            <div class="col-md-6">
+                <a href="/boards/write" role="button" class="btn btn-primary">Write</a>
+            </div>
+        </div>
+    </div>
+    <br>
+    <!-- List area -->
+    <table class="table table-horizontal table-bordered">
+        <thead class="thead-strong">
+        <tr>
+            <th>No</th>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Last Modified Date</th>
+        </tr>
+        </thead>
+        <tbody id="tbody">
+        {{#boards}}
+            <tr>
+                <td>{{id}}</td>
+                <td>{{title}}</td>
+                <td>{{author}}</td>
+                <td>{{modifiedDate}}</td>
+            </tr>
+        {{/boards}}
+        </tbody>
+    </table>
+{{>layout/footer}}

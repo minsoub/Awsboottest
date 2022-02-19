@@ -2,6 +2,7 @@ package com.bithumb.service;
 
 import com.bithumb.domain.board.Boards;
 import com.bithumb.domain.board.BoardsRepository;
+import com.bithumb.dto.BoardsListResponseDto;
 import com.bithumb.dto.BoardsResponseDto;
 import com.bithumb.dto.BoardsSaveRequestDto;
 import com.bithumb.dto.BoardsUpdateRequestDto;
@@ -9,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -34,4 +37,13 @@ public class BoardsService {
 
         return new BoardsResponseDto(entity);
     }
+
+    //@Transactional(readOnly = true)
+    // Boards의 Stream을 map을 통해 BoardsListResponseDto변환해서 List로 반환한다.
+    public List<BoardsListResponseDto> findAllDesc() {
+        return boardsRepository.findAllDesc().stream()
+                .map(BoardsListResponseDto::new)
+                .collect(Collectors.toList());
+    }
+
 }

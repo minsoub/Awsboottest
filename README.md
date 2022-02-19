@@ -96,6 +96,69 @@ dependencies {
 - Domain Model
   - @Entity가 사용되는 영역이자만 I/O처럼 값 객체들오 이 영역에 해당 될 수 있음.
   - 비즈니스 로직 처리를 여기서 수행.
+
+### JPA Auditing 사용
+- abstract class define
+- @MappedSuperclass
+  JPS Entity 클래스가 BaseTimeEntity 클래스를 상속 할 경우 필드도 컬럼으로 인식
+- @EntityListeners(AuditingEntityListener.class)
+  BaseTimeEntity 클래스에 Auditing 기능을 포함시킨다.
+- @CreatedDate
+  Entity가 저장될 때 시간이 자동 저장
+- @LastModifiedDate
+  조회한 Entity의 값을 변경할 때 시간이 자동 저장된다.
+```java
+package com.bithumb.domain;
+
+import lombok.Getter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import javax.persistence.EntityListeners;
+import javax.persistence.MappedSuperclass;
+import java.time.LocalDateTime;
+
+@Getter
+@MappedSuperclass
+@EntityListeners(AuditingEntityListener.class)
+public abstract class BaseTimeEntity {
+    @CreatedDate
+    private LocalDateTime createdDate;
+
+    @LastModifiedDate
+    private LocalDateTime modifiedDate;
+}
+```
+- Entity class에 상속 받는다.
+```java
+public class Boards extends BaseTimeEntity
+```
+- JPA Auditing 어노테이션 활성화
+```java
+package com.bithumb;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+
+@EnableJpaAuditing
+@SpringBootApplication
+public class Application {
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
+}
+```
+### mustache 사용하기
+- Intellij Community 버전에서 mustache plugin을 사용할 수 있다.
+- Ctrl + Shift + A에서 Plugin으로 검색해서 Plugin으로 들어가서 mustache로 검색해서 플러그인을 설치한다.
+- build.gradle 파일에 다음과 같이 추가한다.
+```groovy
+implementation 'org.springframework.boot:spring-boot-starter-mustache'
+```
+- mustache는 스프링 부트에서 공식 지원하는 템플릿 엔진이다. 
+- mustache의 파일 위치는 기본적으로 src/main/resources/templates이다. 
 ### JUnit 테스트 
 - build.gradle 파일에 아래 내용을 추가한다.
 ```groovy
@@ -247,5 +310,39 @@ public class BoardsApiControllerTest {
 
     }
 }
+```
+### JUnit Test - JPA Auditing Test
+```java
+    @Test
+    public void basetimetoentity_register() {
+        // given
+        LocalDateTime now = LocalDateTime.of(2022, 2, 19, 0, 0, 0);
+        boardsRepository.save(Boards.builder()
+                .title("entity title test")
+                .content("entity content text")
+                .author("minsoub@gmail.com")
+                .build());
 
+        // when
+        List<Boards> boardsList = boardsRepository.findAll();
+
+        // then
+        Boards boards = boardsList.get(0);
+
+        System.out.println(">>>>>>>>>>>>>>> CreateDate = "+boards.getCreatedDate()+", modifiedDate = " + boards.getModifiedDate());
+
+        assertThat(boards.getCreatedDate()).isAfter(now);
+        assertThat(boards.getModifiedDate()).isAfter(now);
+    }
+```
+### JUnit Test - troubleshooting
+- 에러 내용
+```shell
+Error creating bean with name 'jpaAuditingHandler': Cannot resolve reference to bean 'jpaMappingContext' while setting constructor argument; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'jpaMappingContext': Invocation of init method failed; nested exception is java.lang.IllegalArgumentException: At least one JPA metamodel must be present!
+```
+- 조치 내역
+  테스트 파일에 아래 내용을 추가해야 한다.    
+  위의 에러는 테스트 중에 데이터베이스가 연결이 되지 않아서 발생한 내용이다.   
+```java
+@MockBean(JpaMetamodelMappingContext.class)
 ```
