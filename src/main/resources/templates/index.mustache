@@ -1,9 +1,17 @@
 {{>layout/header}}
     <h1>Spring Boot Web Service Test</h1>
     <div class="col-md-12">
+        <!-- Login area -->
         <div class="row">
             <div class="col-md-6">
                 <a href="/boards/write" role="button" class="btn btn-primary">Write</a>
+                {{#userName}}
+                    Logged in as: <span id="user">{{userName}}</span>
+                    <a href="/logout" class="btn btn-info active" role="button">Logout</a>
+                {{/userName}}
+                {{^userName}}
+                    <a href="/oauth2/authorization/google" class="btn btn-success active" role="button">Google Login</a>
+                {{/userName}}
             </div>
         </div>
     </div>
@@ -22,7 +30,7 @@
         {{#boards}}
             <tr>
                 <td>{{id}}</td>
-                <td>{{title}}</td>
+                <td><a href="/boards/update/{{id}}">{{title}}</a></td>
                 <td>{{author}}</td>
                 <td>{{modifiedDate}}</td>
             </tr>

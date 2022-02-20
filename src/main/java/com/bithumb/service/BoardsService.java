@@ -46,4 +46,11 @@ public class BoardsService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
+    public void delete(Long id) {
+        Boards boards = boardsRepository.findById(id).orElseThrow(()->new IllegalArgumentException("해당 글이 없습니다. id="+id));
+
+        boardsRepository.delete(boards);
+    }
+
 }
